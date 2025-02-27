@@ -106,6 +106,42 @@ export function getCoordinates(molecule) {
           ];
           currentAtom.coordinates = newCoordinates;
           console.log("New Direction for atom: ", currentAtom, newDirection);
+        } else if (parentAtom.hybridisation === "sp3d") {
+          const allNeighbors = molecule.getNeighbours(parentAtom);
+          const connectionIndex = allNeighbors.findIndex(
+            atom => atom.atomName === currentAtom.atomName
+          );
+          
+          if (connectionIndex !== -1) {
+            const newCoordinates = calculateSp3dCoordinates(
+              parentCoordinates,
+              connectionIndex,
+              allNeighbors.length,
+              1
+            );
+            
+            currentAtom.coordinates = newCoordinates;
+            
+            const newDirection = [
+              newCoordinates[0] - parentCoordinates[0],
+              newCoordinates[1] - parentCoordinates[1],
+              newCoordinates[2] - parentCoordinates[2]
+            ];
+            
+            const magnitude = Math.sqrt(
+              newDirection[0] * newDirection[0] + 
+              newDirection[1] * newDirection[1] + 
+              newDirection[2] * newDirection[2]
+            );
+            
+            if (magnitude > 0) {
+              newDirection[0] /= magnitude;
+              newDirection[1] /= magnitude;
+              newDirection[2] /= magnitude;
+            }
+            
+            directionVectorStack.push(newDirection);
+          }
         } else {
           if (
             (initalDirection[0] === 1 &&
