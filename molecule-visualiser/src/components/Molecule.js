@@ -51,6 +51,11 @@ export function getCoordinates(molecule) {
       angleY: 0.955 * Math.PI,
       angleZ: 0.615 * Math.PI,
     },
+    sp3d: {
+      angleX: Math.PI / 2,
+      angleY: Math.PI / 2,
+      angleZ: Math.PI / 2,
+    },
   };
 
   // Get Central Atoms of the Molecule.
@@ -75,8 +80,7 @@ export function getCoordinates(molecule) {
         currentAtom.coordinates = [0, 0, 0];
         directionVectorStack.push([1, 0, 0]);
       } else {
-        let initalDirection =
-          directionVectorStack[directionVectorStack.length - 1];
+        let initalDirection = directionVectorStack[directionVectorStack.length - 1];
         console.log("Initial Direction: ", initalDirection);
         let parentCoordinates = parentAtom.coordinates;
         let angleX, angleY, angleZ;
@@ -273,6 +277,30 @@ export function getCoordinates(molecule) {
       currentAtom.connections = neighbours;
     }
     console.log("New Central Atoms: ", centralAtoms);
+  }
+}
+
+function isAxialPosition(index, totalConnections) {
+  return index === 0 || index === totalConnections - 1;
+}
+
+function calculateSp3dCoordinates(parentCoordinates, connectionIndex, totalConnections, bondLength = 1) {
+  if (isAxialPosition(connectionIndex, totalConnections)) {
+    const zDirection = connectionIndex === 0 ? 1 : -1;
+    return [
+      parentCoordinates[0],
+      parentCoordinates[1],
+      parentCoordinates[2] + (zDirection * bondLength)
+    ];
+  } else {
+    const equatorialIndex = connectionIndex - 1;
+    const angle = (2 * Math.PI / 3) * equatorialIndex;
+    
+    return [
+      parentCoordinates[0] + bondLength * Math.cos(angle),
+      parentCoordinates[1] + bondLength * Math.sin(angle),
+      parentCoordinates[2]
+    ];
   }
 }
 
