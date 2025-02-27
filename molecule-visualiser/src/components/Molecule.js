@@ -41,7 +41,10 @@ export function findCentralAtoms(molecule) {
 
 // Calculate Coordiantes of the atoms in 3D Plane.
 export function getCoordinates(molecule) {
-  
+  molecule.atomList.forEach(atom => {
+      atom.bondsAssignedCount = 0;
+  });
+
   // Constant Angles defined for respective hybridisations.
   const angles = {
     sp: { angleX: Math.PI, angleY: 0, angleZ: 0 },
@@ -107,6 +110,28 @@ export function getCoordinates(molecule) {
           ];
           currentAtom.coordinates = newCoordinates;
           console.log("New Direction for atom: ", currentAtom, newDirection);
+        } else if (parentAtom.hybridisation === "sp3d2") {
+          const octahedralCoords = generateOctahedralCoordinates(parentCoordinates);
+  
+          if (typeof parentAtom.bondsAssignedCount === "undefined") {
+            parentAtom.bondsAssignedCount = 0;
+          }
+          
+          let positionIndex = parentAtom.bondsAssignedCount;
+          if (positionIndex >= octahedralCoords.length) {
+            positionIndex = octahedralCoords.length - 1;
+          }
+          
+          parentAtom.bondsAssignedCount += 1;
+          currentAtom.coordinates = octahedralCoords[positionIndex];
+          
+          newDirection = [
+            octahedralCoords[positionIndex][0] - parentCoordinates[0],
+            octahedralCoords[positionIndex][1] - parentCoordinates[1],
+            octahedralCoords[positionIndex][2] - parentCoordinates[2],
+          ];
+          
+          directionVectorStack.push(newDirection);
         } else {
           if (
             (initalDirection[0] === 1 &&
