@@ -38,8 +38,8 @@ Please adhere to this project's `code of conduct`.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/TharunKumarrA/Molecule-Visualiser-DSA.git
-cd Molecule-Visualiser-DSA
+git clone https://github.com/TharunKumarrA/Molecule-Visualiser.git
+cd Molecule-Visualiser
 ```
 
 ### 2. Install Backend Dependencies
@@ -53,7 +53,7 @@ cd ..
 ### 3. Install Frontend Dependencies
 
 ```bash
-cd molecule-visulaiser
+cd molecule-visualiser
 npm install
 cd ..
 ```
@@ -76,12 +76,14 @@ API_KEY=<YOUR_SECRET_KEY>
 ### 5. Start the Backend Server
 
 ```bash
+cd Backend
 nodemon App.js
 ```
 
 ### 6. Start the Frontend Server
 
 ```bash
+cd molecule-visualiser
 npm run start
 ```
 ## API Utilized
