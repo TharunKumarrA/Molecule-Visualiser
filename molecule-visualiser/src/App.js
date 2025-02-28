@@ -108,6 +108,10 @@ const MoleculeVisualizer = () => {
             return "black";
           case "H":
             return "#87CEEB"; // Medium Light Blue
+          case "S":
+            return "yellow";
+          case "F":
+            return "#32CD32";
           default:
             return "#CD5C5C"; // Indian Red
         }
@@ -315,7 +319,7 @@ const MoleculeVisualizer = () => {
     return bondMenuItems;
   };
 
-  const sampleMolecules = ["CH4", "C2H6", "C6H6", "H2O"];
+  const sampleMolecules = ["CH4", "C2H6", "C6H6", "H2O", "SF6"];
 
   return (
     <div className="flex flex-col h-screen bg-[#141414] font-inter">

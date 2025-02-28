@@ -41,7 +41,10 @@ export function findCentralAtoms(molecule) {
 
 // Calculate Coordiantes of the atoms in 3D Plane.
 export function getCoordinates(molecule) {
-  
+  molecule.atomList.forEach(atom => {
+      atom.bondsAssignedCount = 0;
+  });
+
   // Constant Angles defined for respective hybridisations.
   const angles = {
     sp: { angleX: Math.PI, angleY: 0, angleZ: 0 },
@@ -51,6 +54,11 @@ export function getCoordinates(molecule) {
       angleY: 0.955 * Math.PI,
       angleZ: 0.615 * Math.PI,
     },
+    sp3d2: { 
+      angleX: Math.PI / 2,
+      angleY: Math.PI / 2, 
+      angleZ: Math.PI / 2 
+    }
   };
 
   // Get Central Atoms of the Molecule.
@@ -102,6 +110,28 @@ export function getCoordinates(molecule) {
           ];
           currentAtom.coordinates = newCoordinates;
           console.log("New Direction for atom: ", currentAtom, newDirection);
+        } else if (parentAtom.hybridisation === "sp3d2") {
+          const octahedralCoords = generateOctahedralCoordinates(parentCoordinates);
+  
+          if (typeof parentAtom.bondsAssignedCount === "undefined") {
+            parentAtom.bondsAssignedCount = 0;
+          }
+          
+          let positionIndex = parentAtom.bondsAssignedCount;
+          if (positionIndex >= octahedralCoords.length) {
+            positionIndex = octahedralCoords.length - 1;
+          }
+          
+          parentAtom.bondsAssignedCount += 1;
+          currentAtom.coordinates = octahedralCoords[positionIndex];
+          
+          newDirection = [
+            octahedralCoords[positionIndex][0] - parentCoordinates[0],
+            octahedralCoords[positionIndex][1] - parentCoordinates[1],
+            octahedralCoords[positionIndex][2] - parentCoordinates[2],
+          ];
+          
+          directionVectorStack.push(newDirection);
         } else {
           if (
             (initalDirection[0] === 1 &&
@@ -274,6 +304,23 @@ export function getCoordinates(molecule) {
     }
     console.log("New Central Atoms: ", centralAtoms);
   }
+}
+
+function generateOctahedralCoordinates(parentCoordinates, bondLength = 1) {
+  const directions = [
+    [1, 0, 0],   
+    [-1, 0, 0],  
+    [0, 1, 0],   
+    [0, -1, 0],  
+    [0, 0, 1],  
+    [0, 0, -1]  
+  ];
+  
+  return directions.map(dir => [
+    parentCoordinates[0] + bondLength * dir[0],
+    parentCoordinates[1] + bondLength * dir[1],
+    parentCoordinates[2] + bondLength * dir[2]
+  ]);
 }
 
 // Returns true if central atoms list doesnt have any atom yet to be visited.
