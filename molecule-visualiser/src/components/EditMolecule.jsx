@@ -164,6 +164,28 @@ export default function EditMolecule({
         getCoordinates(water);
         setMolecule(water);
         break;
+      case "SF6":
+        const sulfurHexaFluoride = new Molecule();
+        
+        addAtoms(sulfurHexaFluoride, createAtomNode("S0", "sp3d2", "S"));
+        addAtoms(sulfurHexaFluoride, createAtomNode("F0", "sp", "F"));
+        addAtoms(sulfurHexaFluoride, createAtomNode("F1", "sp", "F"));
+        addAtoms(sulfurHexaFluoride, createAtomNode("F2", "sp", "F"));
+        addAtoms(sulfurHexaFluoride, createAtomNode("F3", "sp", "F"));
+        addAtoms(sulfurHexaFluoride, createAtomNode("F4", "sp", "F"));
+        addAtoms(sulfurHexaFluoride, createAtomNode("F5", "sp", "F"));
+        
+        addBonds(sulfurHexaFluoride, "S0", "F0", true, false, false);
+        addBonds(sulfurHexaFluoride, "S0", "F1", true, false, false);
+        addBonds(sulfurHexaFluoride, "S0", "F2", true, false, false);
+        addBonds(sulfurHexaFluoride, "S0", "F3", true, false, false);
+        addBonds(sulfurHexaFluoride, "S0", "F4", true, false, false);
+        addBonds(sulfurHexaFluoride, "S0", "F5", true, false, false);
+        
+        setAtomCounters({ C: 0, H: 0, O: 0, N: 0, S: 1, F: 6 });
+        getCoordinates(sulfurHexaFluoride);
+        setMolecule(sulfurHexaFluoride);
+        break;
       default:
         break;
     }
@@ -258,6 +280,7 @@ export default function EditMolecule({
                 <FormControlLabel value="sp2" control={<Radio />} label="sp2" />
                 <FormControlLabel value="sp3" control={<Radio />} label="sp3" />
                 <FormControlLabel value="sp3d" control={<Radio />} label="sp3d" />
+                <FormControlLabel value="sp3d2" control={<Radio />} label="sp3d2" />
               </RadioGroup>
               <Button
                 type="submit"
