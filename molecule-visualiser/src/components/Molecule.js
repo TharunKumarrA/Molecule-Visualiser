@@ -54,6 +54,11 @@ export function getCoordinates(molecule) {
       angleY: 0.955 * Math.PI,
       angleZ: 0.615 * Math.PI,
     },
+    sp3d: {
+      angleX: Math.PI / 2,
+      angleY: Math.PI / 2,
+      angleZ: Math.PI / 2,
+    },
     sp3d2: { 
       angleX: Math.PI / 2,
       angleY: Math.PI / 2, 
@@ -83,8 +88,7 @@ export function getCoordinates(molecule) {
         currentAtom.coordinates = [0, 0, 0];
         directionVectorStack.push([1, 0, 0]);
       } else {
-        let initalDirection =
-          directionVectorStack[directionVectorStack.length - 1];
+        let initalDirection = directionVectorStack[directionVectorStack.length - 1];
         console.log("Initial Direction: ", initalDirection);
         let parentCoordinates = parentAtom.coordinates;
         let angleX, angleY, angleZ;
@@ -110,6 +114,42 @@ export function getCoordinates(molecule) {
           ];
           currentAtom.coordinates = newCoordinates;
           console.log("New Direction for atom: ", currentAtom, newDirection);
+        } else if (parentAtom.hybridisation === "sp3d") {
+          const allNeighbors = molecule.getNeighbours(parentAtom);
+          const connectionIndex = allNeighbors.findIndex(
+            atom => atom.atomName === currentAtom.atomName
+          );
+          
+          if (connectionIndex !== -1) {
+            const newCoordinates = calculateSp3dCoordinates(
+              parentCoordinates,
+              connectionIndex,
+              allNeighbors.length,
+              1
+            );
+            
+            currentAtom.coordinates = newCoordinates;
+            
+            const newDirection = [
+              newCoordinates[0] - parentCoordinates[0],
+              newCoordinates[1] - parentCoordinates[1],
+              newCoordinates[2] - parentCoordinates[2]
+            ];
+            
+            const magnitude = Math.sqrt(
+              newDirection[0] * newDirection[0] + 
+              newDirection[1] * newDirection[1] + 
+              newDirection[2] * newDirection[2]
+            );
+            
+            if (magnitude > 0) {
+              newDirection[0] /= magnitude;
+              newDirection[1] /= magnitude;
+              newDirection[2] /= magnitude;
+            }
+            
+            directionVectorStack.push(newDirection);
+          }
         } else if (parentAtom.hybridisation === "sp3d2") {
           const octahedralCoords = generateOctahedralCoordinates(parentCoordinates);
   
@@ -306,6 +346,28 @@ export function getCoordinates(molecule) {
   }
 }
 
+function isAxialPosition(index, totalConnections) {
+  return index === 0 || index === totalConnections - 1;
+}
+
+function calculateSp3dCoordinates(parentCoordinates, connectionIndex, totalConnections, bondLength = 1) {
+  if (isAxialPosition(connectionIndex, totalConnections)) {
+    const zDirection = connectionIndex === 0 ? 1 : -1;
+    return [
+      parentCoordinates[0],
+      parentCoordinates[1],
+      parentCoordinates[2] + (zDirection * bondLength)
+    ];
+  } else {
+    const equatorialIndex = connectionIndex - 1;
+    const angle = (2 * Math.PI / 3) * equatorialIndex;
+    
+    return [
+      parentCoordinates[0] + bondLength * Math.cos(angle),
+      parentCoordinates[1] + bondLength * Math.sin(angle),
+      parentCoordinates[2]
+    ];
+  }
 function generateOctahedralCoordinates(parentCoordinates, bondLength = 1) {
   const directions = [
     [1, 0, 0],   

@@ -74,6 +74,26 @@ export default function EditMolecule({
         getCoordinates(methane);
         setMolecule(methane);
         break;
+      case "PCl5":
+        const phosphorusPentachloride = new Molecule();
+        
+        addAtoms(phosphorusPentachloride, createAtomNode("P0", "sp3d", "P"));
+        addAtoms(phosphorusPentachloride, createAtomNode("Cl0", "sp", "Cl"));
+        addAtoms(phosphorusPentachloride, createAtomNode("Cl1", "sp", "Cl"));
+        addAtoms(phosphorusPentachloride, createAtomNode("Cl2", "sp", "Cl"));
+        addAtoms(phosphorusPentachloride, createAtomNode("Cl3", "sp", "Cl"));
+        addAtoms(phosphorusPentachloride, createAtomNode("Cl4", "sp", "Cl"));
+        
+        addBonds(phosphorusPentachloride, "P0", "Cl0", true, false, false);
+        addBonds(phosphorusPentachloride, "P0", "Cl1", true, false, false);
+        addBonds(phosphorusPentachloride, "P0", "Cl2", true, false, false);
+        addBonds(phosphorusPentachloride, "P0", "Cl3", true, false, false);
+        addBonds(phosphorusPentachloride, "P0", "Cl4", true, false, false);
+        
+        setAtomCounters({ C: 0, H: 0, O: 0, N: 0, P: 1, Cl: 5 });
+        getCoordinates(phosphorusPentachloride);
+        setMolecule(phosphorusPentachloride);
+        break;
       case "C2H6":
         const ethane = new Molecule();
 
@@ -259,6 +279,7 @@ export default function EditMolecule({
                 <FormControlLabel value="sp" control={<Radio />} label="sp" />
                 <FormControlLabel value="sp2" control={<Radio />} label="sp2" />
                 <FormControlLabel value="sp3" control={<Radio />} label="sp3" />
+                <FormControlLabel value="sp3d" control={<Radio />} label="sp3d" />
                 <FormControlLabel value="sp3d2" control={<Radio />} label="sp3d2" />
               </RadioGroup>
               <Button
