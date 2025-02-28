@@ -368,6 +368,8 @@ function calculateSp3dCoordinates(parentCoordinates, connectionIndex, totalConne
       parentCoordinates[2]
     ];
   }
+}
+
 function generateOctahedralCoordinates(parentCoordinates, bondLength = 1) {
   const directions = [
     [1, 0, 0],   
@@ -384,6 +386,7 @@ function generateOctahedralCoordinates(parentCoordinates, bondLength = 1) {
     parentCoordinates[2] + bondLength * dir[2]
   ]);
 }
+
 
 // Returns true if central atoms list doesnt have any atom yet to be visited.
 function checkCentralVisited(centralVisited, centralAtoms) {
@@ -416,6 +419,9 @@ function magnitude(v) {
 // Helper function to normalize a vector
 function normalize(v) {
   const mag = magnitude(v);
+  if (mag === 0) {
+    return [0, 0, 0]; 
+  }
   return [v[0] / mag, v[1] / mag, v[2] / mag];
 }
 
@@ -468,96 +474,55 @@ function calculateVector120DegreesOnPlane(
   return vector120Degrees;
 }
 
-function findFourthCoordinate(p1, p2, p3, angle = 109) {
-  // Calculate the normal vector of the plane formed by the three given points
-  const v1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
-  const v2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]];
-  const normal = [
-    v1[1] * v2[2] - v1[2] * v2[1],
-    v1[2] * v2[0] - v1[0] * v2[2],
-    v1[0] * v2[1] - v1[1] * v2[0],
+function findThirdCoordinate(v1, v2) {
+  const norm1 = normalize(v1);
+  const norm2 = normalize(v2);
+
+  const perpendicular = normalize(crossProduct(norm1, norm2));
+  const tetrahedralAngle = 109.5 * (Math.PI / 180);
+
+  const dotProduct = norm1[0] * norm2[0] + norm1[1] * norm2[1] + norm1[2] * norm2[2];
+
+  const existingAngle = Math.acos(dotProduct);
+  const rotationAngle = (tetrahedralAngle - existingAngle) / 2;
+  const rotationAxis = perpendicular;
+  
+  const c = Math.cos(rotationAngle);
+  const s = Math.sin(rotationAngle);
+  const t = 1 - c;
+  const x = rotationAxis[0];
+  const y = rotationAxis[1];
+  const z = rotationAxis[2];
+  
+  const rotatedVector = [
+    (t * x * x + c) * norm1[0] + (t * x * y - s * z) * norm1[1] + (t * x * z + s * y) * norm1[2],
+    (t * x * y + s * z) * norm1[0] + (t * y * y + c) * norm1[1] + (t * y * z - s * x) * norm1[2],
+    (t * x * z - s * y) * norm1[0] + (t * y * z + s * x) * norm1[1] + (t * z * z + c) * norm1[2]
   ];
-
-  // Normalize the normal vector
-  const normalLength = Math.sqrt(
-    normal[0] ** 2 + normal[1] ** 2 + normal[2] ** 2
-  );
-  const normalizedNormal = normal.map((x) => x / normalLength);
-  // Calculate the angle between the normal vector and the z-axis
-  const angleWithZAxis = Math.acos(normalizedNormal[2]);
-
-  // Calculate the rotation axis as the cross product of the normal vector and the z-axis
-  const rotationAxis = [-normalizedNormal[1], normalizedNormal[0], 0];
-  // Calculate the rotation quaternion
-  const rotationAngle =
-    (angleWithZAxis + (angle * Math.PI) / 180) % (2 * Math.PI);
-  const rotationQuaternion = [
-    Math.cos(rotationAngle / 2),
-    rotationAxis[0] * Math.sin(rotationAngle / 2),
-    rotationAxis[1] * Math.sin(rotationAngle / 2),
-    rotationAxis[2] * Math.sin(rotationAngle / 2),
-  ];
-
-  // Rotate the z-axis by the calculated rotation quaternion
-  const rotatedZAxis = [
-    rotationQuaternion[0] ** 2 +
-      rotationQuaternion[1] ** 2 -
-      rotationQuaternion[2] ** 2 -
-      rotationQuaternion[3] ** 2,
-    2 *
-      (rotationQuaternion[1] * rotationQuaternion[2] -
-        rotationQuaternion[0] * rotationQuaternion[3]),
-    2 *
-      (rotationQuaternion[1] * rotationQuaternion[3] +
-        rotationQuaternion[0] * rotationQuaternion[2]),
-  ];
-
-  // Scale the rotated z-axis to a desired length (e.g., 1)
-  const desiredLength = 1;
-  const fourthCoordinate = rotatedZAxis.map((x) => x * desiredLength);
-  return fourthCoordinate;
+  
+  const thirdVector = normalize([
+    rotatedVector[0] + perpendicular[0] * Math.sin(tetrahedralAngle),
+    rotatedVector[1] + perpendicular[1] * Math.sin(tetrahedralAngle),
+    rotatedVector[2] + perpendicular[2] * Math.sin(tetrahedralAngle)
+  ]);
+  
+  return thirdVector;
 }
 
-function findThirdCoordinate(p1, p2, angle = 109) {
-  // Calculate the vector between the two given points
-  const v = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
-
-  // Normalize the vector
-  const vLength = Math.sqrt(v[0] ** 2 + v[1] ** 2 + v[2] ** 2);
-  const normalizedV = v.map((x) => x / vLength);
-  // Calculate the angle between the vector and the z-axis
-  const angleWithZAxis = Math.acos(normalizedV[2]);
-
-  // Calculate the rotation axis as the cross product of the vector and the z-axis
-  const rotationAxis = [-normalizedV[1], normalizedV[0], 0];
-  // Calculate the rotation quaternion
-  const rotationAngle =
-    (angleWithZAxis + (angle * Math.PI) / 180) % (2 * Math.PI);
-  const rotationQuaternion = [
-    Math.cos(rotationAngle / 2),
-    rotationAxis[0] * Math.sin(rotationAngle / 2),
-    rotationAxis[1] * Math.sin(rotationAngle / 2),
-    rotationAxis[2] * Math.sin(rotationAngle / 2),
+function findFourthCoordinate(v1, v2, v3) {
+  const norm1 = normalize(v1);
+  const norm2 = normalize(v2);
+  const norm3 = normalize(v3);
+  
+  const sum = [
+    norm1[0] + norm2[0] + norm3[0],
+    norm1[1] + norm2[1] + norm3[1],
+    norm1[2] + norm2[2] + norm3[2]
   ];
-
-  // Rotate the z-axis by the calculated rotation quaternion
-  const rotatedZAxis = [
-    rotationQuaternion[0] ** 2 +
-      rotationQuaternion[1] ** 2 -
-      rotationQuaternion[2] ** 2 -
-      rotationQuaternion[3] ** 2,
-    2 *
-      (rotationQuaternion[1] * rotationQuaternion[2] -
-        rotationQuaternion[0] * rotationQuaternion[3]),
-    2 *
-      (rotationQuaternion[1] * rotationQuaternion[3] +
-        rotationQuaternion[0] * rotationQuaternion[2]),
-  ];
-
-  // Scale the rotated z-axis to a desired length (e.g., 1)
-  const desiredLength = 1;
-  const thirdCoordinate = rotatedZAxis.map((x) => x * desiredLength);
-  return thirdCoordinate;
+  
+  const fourthVector = normalize([-sum[0], -sum[1], -sum[2]]);
+  
+  return fourthVector;
 }
 
 function rotateVectorAroundXYPlane(vector, angleInDegrees) {
