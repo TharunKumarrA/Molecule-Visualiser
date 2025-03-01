@@ -381,10 +381,28 @@ const MoleculeVisualizer = () => {
       <NavBar />
       <div className="flex flex-col h-screen bg-[#141414] font-inter">
         {/* Warning message for small and medium screens */}
-        <div className="flex sm:hidden items-center justify-center h-full w-screen bg-red-500 text-white text-lg font-bold text-center">
-          This site is not available on mobile or tablet screens. Please use a
-          larger screen.
+        <div className="flex sm:hidden flex-col items-center justify-center h-full w-screen bg-neutral-900 text-white p-6">
+          <div className="flex flex-col items-center gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-14 h-14 text-gray-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="12" y1="18" x2="12.01" y2="18" />
+            </svg>
+            <p className="text-xl font-semibold">Unsupported Screen Size</p>
+            <p className="text-gray-400 text-sm">
+              Please use a larger screen for the best experience.
+            </p>
+          </div>
         </div>
+
         {/* Main content, hidden on sm and md screens */}
         <div className="hidden sm:flex flex-row w-screen overflow-hidden h-full text-white">
           <div className="flex w-1/4">

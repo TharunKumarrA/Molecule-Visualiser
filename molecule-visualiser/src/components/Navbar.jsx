@@ -44,7 +44,7 @@ export default function NavBar() {
       {isOpen && (
         <div className="lg:hidden flex flex-col items-center space-y-6 text-lg bg-[#1a1a1a] py-6">
           <Link
-            to="/visualizer"
+            to="/"
             className="hover:text-[#2ABD91]"
             onClick={() => setIsOpen(false)}
           >
