@@ -330,6 +330,19 @@ const MoleculeVisualizer = () => {
         showbackground: true,
         zerolinecolor: "#444444",
       },
+      annotations:
+        molecule.atomList.length === 0
+          ? [
+              {
+                text: "Add atoms and bonds using the menu on the right.",
+                showarrow: false,
+                x: 0,
+                y: 0,
+                z: 0,
+                font: { size: 20, color: "#ffffff" },
+              },
+            ]
+          : [],
     },
   };
 

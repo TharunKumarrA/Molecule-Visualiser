@@ -6,7 +6,7 @@ import Teams from "./pages/Teams";
 export default function App() {
   return (
     <Router>
-      <div className="bg-[#141414] text-white min-h-screen font-inter">
+      <div className="bg-[#141414] text-white min-h-screen font-inter overflow-x-hidden">
         <Routes>
           <Route path="/" element={<MoleculeVisualizer />} />
           <Route path="/teams" element={<Teams />} />
