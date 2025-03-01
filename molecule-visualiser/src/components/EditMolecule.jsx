@@ -58,13 +58,9 @@ export default function EditMolecule({
     // Create a new empty molecule
     const emptyMolecule = new Molecule();
 
-    // Reset the molecule
+    // Reset molecule and related states
     setMolecule(emptyMolecule);
-
-    // Reset atoms list
     setAtomsList([]);
-
-    // Reset atom counters
     setAtomCounters({ C: 0, H: 0, O: 0, N: 0, P: 0, S: 0, F: 0, Cl: 0 });
 
     // Reset form states to defaults
@@ -74,20 +70,26 @@ export default function EditMolecule({
     });
 
     setBondData({
-      bondFrom: bondMenuItems[0].value,
-      bondTo: bondMenuItems[1].value,
+      bondFrom: bondMenuItems[0]?.value || "",
+      bondTo: bondMenuItems[1]?.value || "",
       bondType: "single",
     });
+
+    // Reset accordion expansion
+    setExpandedAccordion("panel1");
+
+    // Reset selected molecule dropdown
+    setSelectedMolecule(sampleMolecules[0]);
 
     // If there's a molecule update handler, call it
     if (handleMoleculeUpdate) {
       handleMoleculeUpdate(emptyMolecule);
     }
 
-    // Add this line to trigger AI reset
+    // Trigger AI reset
     handleDataFromEditMolecule({ type: "clear" });
 
-    console.log("Molecule cleared");
+    console.log("Molecule and all states cleared");
   };
 
   const handleShowMolecule = () => {

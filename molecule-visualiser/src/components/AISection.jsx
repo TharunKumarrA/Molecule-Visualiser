@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 export default function AISection({ compoundFormula, resetAI }) {
   const [res, setResponse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasDisplayedInfo, setHasDisplayedInfo] = useState(false);
 
   const serverPort = process.env.PORT || 5000;
   const BASE_URL =
@@ -15,6 +16,7 @@ export default function AISection({ compoundFormula, resetAI }) {
   useEffect(() => {
     if (resetAI) {
       setResponse(null);
+      setHasDisplayedInfo(false);
     }
   }, [resetAI]);
 
@@ -22,8 +24,12 @@ export default function AISection({ compoundFormula, resetAI }) {
   useEffect(() => {
     if (!compoundFormula || compoundFormula === "") {
       setResponse(null);
+      setHasDisplayedInfo(false);
+    } else if (res === null) {
+      // If we have a compound formula but no response, we should show the button
+      setHasDisplayedInfo(false);
     }
-  }, [compoundFormula]);
+  }, [compoundFormula, res]);
 
   const handleGetData = () => {
     // Don't fetch if there's no compound formula
@@ -37,6 +43,7 @@ export default function AISection({ compoundFormula, resetAI }) {
       .then((response) => {
         console.log(response.data);
         setResponse(response.data);
+        setHasDisplayedInfo(true);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -76,7 +83,7 @@ export default function AISection({ compoundFormula, resetAI }) {
         </div>
       ) : (
         <>
-          {!res && compoundFormula && (
+          {!res && compoundFormula && !hasDisplayedInfo && (
             <button
               onClick={handleGetData}
               className="flex justify-center items-center border-2 border-[#2ABD91] py-2 rounded-full mx-auto cursor-pointer px-6 hover:bg-[#2ABD91] hover:text-black"
