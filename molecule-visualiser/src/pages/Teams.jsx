@@ -15,13 +15,20 @@ export default function Teams() {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const GITHUB_TOKEN = process.env.REACT_APP_GITHUB_TOKEN;
+
   useEffect(() => {
     async function fetchProfiles() {
       setLoading(true);
       const promises = teamMembers.map(async (username) => {
         try {
           const res = await axios.get(
-            `https://api.github.com/users/${username}`
+            `https://api.github.com/users/${username}`,
+            {
+              headers: {
+                Authorization: `Bearer ${GITHUB_TOKEN}`,
+              },
+            }
           );
           return {
             name: res.data.name || res.data.login,
