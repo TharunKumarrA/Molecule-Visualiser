@@ -7,6 +7,7 @@ const teamMembers = [
   "Naganathan05",
   "Lowkik-Sai",
   "Hariprasath8064",
+  "S-Bharath16",
   "adithya-menon-r",
   "Twinn-github09",
 ];
