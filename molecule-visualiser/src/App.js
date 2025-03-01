@@ -366,7 +366,14 @@ const MoleculeVisualizer = () => {
   return (
     <div className="flex flex-col h-screen bg-[#141414] font-inter">
       <NavBar />
-      <div className="flex flex-row w-screen overflow-hidden h-full text-white">
+      {/* Warning message for small and medium screens */}
+      <div className="flex sm:hidden items-center justify-center h-full w-screen bg-red-500 text-white text-lg font-bold text-center">
+        This site is not available on mobile or tablet screens. Please use a
+        larger screen.
+      </div>
+
+      {/* Main content, hidden on sm and md screens */}
+      <div className="hidden sm:flex flex-row w-screen overflow-hidden h-full text-white">
         <div className="flex w-1/4">
           <AISection compoundFormula={compoundFormula} resetAI={resetAI} />
         </div>
