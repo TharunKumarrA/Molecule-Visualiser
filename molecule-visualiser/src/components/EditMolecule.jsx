@@ -54,6 +54,42 @@ export default function EditMolecule({
     console.log("currently selected bond type: ", value);
   };
 
+  const handleClearMolecule = () => {
+    // Create a new empty molecule
+    const emptyMolecule = new Molecule();
+
+    // Reset the molecule
+    setMolecule(emptyMolecule);
+
+    // Reset atoms list
+    setAtomsList([]);
+
+    // Reset atom counters
+    setAtomCounters({ C: 0, H: 0, O: 0, N: 0, P: 0, S: 0, F: 0, Cl: 0 });
+
+    // Reset form states to defaults
+    setAtomData({
+      atomType: "C",
+      hybridization: "sp",
+    });
+
+    setBondData({
+      bondFrom: bondMenuItems[0].value,
+      bondTo: bondMenuItems[1].value,
+      bondType: "single",
+    });
+
+    // If there's a molecule update handler, call it
+    if (handleMoleculeUpdate) {
+      handleMoleculeUpdate(emptyMolecule);
+    }
+
+    // Add this line to trigger AI reset
+    handleDataFromEditMolecule({ type: "clear" });
+
+    console.log("Molecule cleared");
+  };
+
   const handleShowMolecule = () => {
     switch (selectedMolecule) {
       case "CH4":
@@ -76,20 +112,20 @@ export default function EditMolecule({
         break;
       case "PCl5":
         const phosphorusPentachloride = new Molecule();
-        
+
         addAtoms(phosphorusPentachloride, createAtomNode("P0", "sp3d", "P"));
         addAtoms(phosphorusPentachloride, createAtomNode("Cl0", "sp", "Cl"));
         addAtoms(phosphorusPentachloride, createAtomNode("Cl1", "sp", "Cl"));
         addAtoms(phosphorusPentachloride, createAtomNode("Cl2", "sp", "Cl"));
         addAtoms(phosphorusPentachloride, createAtomNode("Cl3", "sp", "Cl"));
         addAtoms(phosphorusPentachloride, createAtomNode("Cl4", "sp", "Cl"));
-        
+
         addBonds(phosphorusPentachloride, "P0", "Cl0", true, false, false);
         addBonds(phosphorusPentachloride, "P0", "Cl1", true, false, false);
         addBonds(phosphorusPentachloride, "P0", "Cl2", true, false, false);
         addBonds(phosphorusPentachloride, "P0", "Cl3", true, false, false);
         addBonds(phosphorusPentachloride, "P0", "Cl4", true, false, false);
-        
+
         setAtomCounters({ C: 0, H: 0, O: 0, N: 0, P: 1, Cl: 5 });
         getCoordinates(phosphorusPentachloride);
         setMolecule(phosphorusPentachloride);
@@ -166,7 +202,7 @@ export default function EditMolecule({
         break;
       case "SF6":
         const sulfurHexaFluoride = new Molecule();
-        
+
         addAtoms(sulfurHexaFluoride, createAtomNode("S0", "sp3d2", "S"));
         addAtoms(sulfurHexaFluoride, createAtomNode("F0", "sp", "F"));
         addAtoms(sulfurHexaFluoride, createAtomNode("F1", "sp", "F"));
@@ -174,14 +210,14 @@ export default function EditMolecule({
         addAtoms(sulfurHexaFluoride, createAtomNode("F3", "sp", "F"));
         addAtoms(sulfurHexaFluoride, createAtomNode("F4", "sp", "F"));
         addAtoms(sulfurHexaFluoride, createAtomNode("F5", "sp", "F"));
-        
+
         addBonds(sulfurHexaFluoride, "S0", "F0", true, false, false);
         addBonds(sulfurHexaFluoride, "S0", "F1", true, false, false);
         addBonds(sulfurHexaFluoride, "S0", "F2", true, false, false);
         addBonds(sulfurHexaFluoride, "S0", "F3", true, false, false);
         addBonds(sulfurHexaFluoride, "S0", "F4", true, false, false);
         addBonds(sulfurHexaFluoride, "S0", "F5", true, false, false);
-        
+
         setAtomCounters({ C: 0, H: 0, O: 0, N: 0, S: 1, F: 6 });
         getCoordinates(sulfurHexaFluoride);
         setMolecule(sulfurHexaFluoride);
@@ -269,6 +305,7 @@ export default function EditMolecule({
                   />
                 ))}
               </RadioGroup>
+              <div className="text-center my-2"></div>
               <div className="text-center my-2">Hybridization</div>
               <RadioGroup
                 defaultValue="sp"
@@ -279,8 +316,16 @@ export default function EditMolecule({
                 <FormControlLabel value="sp" control={<Radio />} label="sp" />
                 <FormControlLabel value="sp2" control={<Radio />} label="sp2" />
                 <FormControlLabel value="sp3" control={<Radio />} label="sp3" />
-                <FormControlLabel value="sp3d" control={<Radio />} label="sp3d" />
-                <FormControlLabel value="sp3d2" control={<Radio />} label="sp3d2" />
+                <FormControlLabel
+                  value="sp3d"
+                  control={<Radio />}
+                  label="sp3d"
+                />
+                <FormControlLabel
+                  value="sp3d2"
+                  control={<Radio />}
+                  label="sp3d2"
+                />
               </RadioGroup>
               <Button
                 type="submit"
@@ -395,17 +440,35 @@ export default function EditMolecule({
                 </MenuItem>
               ))}
             </Select>
-            <Button
-              onClick={handleShowMolecule}
-              variant="outlined"
-              sx={{ color: "white", borderColor: "#2ABD91", marginTop: 2 }}
-            >
-              SHOW MOLECULE
-            </Button>
+            <div className="flex flex-row gap-4 mt-2">
+              <Button
+                onClick={handleShowMolecule}
+                variant="outlined"
+                sx={{ color: "white", borderColor: "#2ABD91" }}
+              >
+                SHOW MOLECULE
+              </Button>
+              <Button
+                onClick={handleClearMolecule}
+                variant="outlined"
+                sx={{ color: "white", borderColor: "#ff5757" }}
+              >
+                CLEAR MOLECULE
+              </Button>
+            </div>
           </AccordionDetails>
         </Accordion>
         <div className="border-2 rounded-xl px-8 py-4 m-2">
           Check Cycle: {checkCycle(molecule) ? "Cyclic" : "Acyclic"}
+        </div>
+        <div className="flex justify-center items-center">
+          <Button
+            onClick={handleClearMolecule}
+            variant="outlined"
+            sx={{ color: "white", borderColor: "#ff5757" }}
+          >
+            CLEAR MOLECULE
+          </Button>
         </div>
       </div>
     </div>

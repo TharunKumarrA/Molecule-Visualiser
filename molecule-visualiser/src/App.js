@@ -17,12 +17,17 @@ const MoleculeVisualizer = () => {
   const [atomsList, setAtomsList] = useState([]);
   const [molecule, setMolecule] = useState(new Molecule());
   const [trigger, setTrigger] = useState(0);
+  const [resetAI, setResetAI] = useState(false);
 
   const [atomCounters, setAtomCounters] = useState({
     C: 0,
     H: 0,
     O: 0,
     N: 0,
+    P: 0,
+    S: 0,
+    F: 0,
+    Cl: 0,
   });
 
   const [compoundFormula, setCompoundFormula] = useState("");
@@ -82,12 +87,36 @@ const MoleculeVisualizer = () => {
       );
       console.log("Bond added between: ", data.atom1Name, data.atom2Name);
       console.log(data);
+    } else if (data.type === "clear") {
+      // Reset all states when clearing the molecule
+      setMolecule(new Molecule());
+      setAtomsList([]);
+      setAtomCounters({
+        C: 0,
+        H: 0,
+        O: 0,
+        N: 0,
+        P: 0,
+        S: 0,
+        F: 0,
+        Cl: 0,
+      });
+      setCompoundFormula("");
+      setTrigger(0); // Reset trigger state
+      setResetAI(true);
+      setTimeout(() => setResetAI(false), 100);
     }
-    setMolecule(molecule);
-    setTrigger(!trigger);
+
+    setTrigger((prev) => prev + 1);
   };
 
   const handleMoleculeUpdate = (updatedMolecule) => {
+    // When molecule is updated (especially cleared), set resetAI to true
+    if (updatedMolecule.atomList.length === 0) {
+      setResetAI(true);
+      setTimeout(() => setResetAI(false), 100);
+    }
+
     setMolecule(updatedMolecule);
     setTrigger(!trigger);
   };
@@ -162,113 +191,117 @@ const MoleculeVisualizer = () => {
   // Add connections data to traceSingleBonds, traceDoubleBonds, and traceTripleBonds
   molecule.atomList.forEach((atom) => {
     const atomConnections = molecule.adjacencyList[atom.atomName];
-    atomConnections.forEach((connection) => {
-      const connectedAtom = molecule.atomList.find(
-        (a) => a.atomName === connection.atomName
-      );
-
-      if (connection.isDoubleBond) {
-        // Main line
-        traceDoubleBonds.x.push(
-          atom.coordinates[0],
-          connectedAtom.coordinates[0],
-          null
-        );
-        traceDoubleBonds.y.push(
-          atom.coordinates[1],
-          connectedAtom.coordinates[1],
-          null
-        );
-        traceDoubleBonds.z.push(
-          atom.coordinates[2],
-          connectedAtom.coordinates[2],
-          null
+    if (atomConnections) {
+      atomConnections.forEach((connection) => {
+        const connectedAtom = molecule.atomList.find(
+          (a) => a.atomName === connection.atomName
         );
 
-        // Offset line
-        traceDoubleBonds.x.push(
-          atom.coordinates[0] + 0.01,
-          connectedAtom.coordinates[0] + 0.01,
-          null
-        );
-        traceDoubleBonds.y.push(
-          atom.coordinates[1],
-          connectedAtom.coordinates[1],
-          null
-        );
-        traceDoubleBonds.z.push(
-          atom.coordinates[2] + 0.01,
-          connectedAtom.coordinates[2],
-          null
-        );
-      } else if (connection.isSingleBond && !connection.isTripleBond) {
-        traceSingleBonds.x.push(
-          atom.coordinates[0],
-          connectedAtom.coordinates[0],
-          null
-        );
-        traceSingleBonds.y.push(
-          atom.coordinates[1],
-          connectedAtom.coordinates[1],
-          null
-        );
-        traceSingleBonds.z.push(
-          atom.coordinates[2],
-          connectedAtom.coordinates[2],
-          null
-        );
-      } else if (connection.isTripleBond) {
-        // Main line
-        traceTripleBonds.x.push(
-          atom.coordinates[0],
-          connectedAtom.coordinates[0],
-          null
-        );
-        traceTripleBonds.y.push(
-          atom.coordinates[1],
-          connectedAtom.coordinates[1],
-          null
-        );
-        traceTripleBonds.z.push(
-          atom.coordinates[2],
-          connectedAtom.coordinates[2],
-          null
-        );
+        if (connectedAtom) {
+          if (connection.isDoubleBond) {
+            // Main line
+            traceDoubleBonds.x.push(
+              atom.coordinates[0],
+              connectedAtom.coordinates[0],
+              null
+            );
+            traceDoubleBonds.y.push(
+              atom.coordinates[1],
+              connectedAtom.coordinates[1],
+              null
+            );
+            traceDoubleBonds.z.push(
+              atom.coordinates[2],
+              connectedAtom.coordinates[2],
+              null
+            );
 
-        // Offset lines
-        traceTripleBonds.x.push(
-          atom.coordinates[0] + 0.01,
-          connectedAtom.coordinates[0] + 0.01,
-          null
-        );
-        traceTripleBonds.y.push(
-          atom.coordinates[1] + 0.01,
-          connectedAtom.coordinates[1] + 0.01,
-          null
-        );
-        traceTripleBonds.z.push(
-          atom.coordinates[2] + 0.01,
-          connectedAtom.coordinates[2] + 0.01,
-          null
-        );
+            // Offset line
+            traceDoubleBonds.x.push(
+              atom.coordinates[0] + 0.01,
+              connectedAtom.coordinates[0] + 0.01,
+              null
+            );
+            traceDoubleBonds.y.push(
+              atom.coordinates[1],
+              connectedAtom.coordinates[1],
+              null
+            );
+            traceDoubleBonds.z.push(
+              atom.coordinates[2] + 0.01,
+              connectedAtom.coordinates[2],
+              null
+            );
+          } else if (connection.isSingleBond && !connection.isTripleBond) {
+            traceSingleBonds.x.push(
+              atom.coordinates[0],
+              connectedAtom.coordinates[0],
+              null
+            );
+            traceSingleBonds.y.push(
+              atom.coordinates[1],
+              connectedAtom.coordinates[1],
+              null
+            );
+            traceSingleBonds.z.push(
+              atom.coordinates[2],
+              connectedAtom.coordinates[2],
+              null
+            );
+          } else if (connection.isTripleBond) {
+            // Main line
+            traceTripleBonds.x.push(
+              atom.coordinates[0],
+              connectedAtom.coordinates[0],
+              null
+            );
+            traceTripleBonds.y.push(
+              atom.coordinates[1],
+              connectedAtom.coordinates[1],
+              null
+            );
+            traceTripleBonds.z.push(
+              atom.coordinates[2],
+              connectedAtom.coordinates[2],
+              null
+            );
 
-        traceTripleBonds.x.push(
-          atom.coordinates[0] - 0.01,
-          connectedAtom.coordinates[0] - 0.01,
-          null
-        );
-        traceTripleBonds.y.push(
-          atom.coordinates[1] - 0.01,
-          connectedAtom.coordinates[1] - 0.01,
-          null
-        );
-        traceTripleBonds.z.push(
-          atom.coordinates[2] - 0.01,
-          connectedAtom.coordinates[2] - 0.01,
-          null
-        );
-      }
-    });
+            // Offset lines
+            traceTripleBonds.x.push(
+              atom.coordinates[0] + 0.01,
+              connectedAtom.coordinates[0] + 0.01,
+              null
+            );
+            traceTripleBonds.y.push(
+              atom.coordinates[1] + 0.01,
+              connectedAtom.coordinates[1] + 0.01,
+              null
+            );
+            traceTripleBonds.z.push(
+              atom.coordinates[2] + 0.01,
+              connectedAtom.coordinates[2] + 0.01,
+              null
+            );
+
+            traceTripleBonds.x.push(
+              atom.coordinates[0] - 0.01,
+              connectedAtom.coordinates[0] - 0.01,
+              null
+            );
+            traceTripleBonds.y.push(
+              atom.coordinates[1] - 0.01,
+              connectedAtom.coordinates[1] - 0.01,
+              null
+            );
+            traceTripleBonds.z.push(
+              atom.coordinates[2] - 0.01,
+              connectedAtom.coordinates[2] - 0.01,
+              null
+            );
+          }
+        }
+      });
+    }
   });
 
   const layout = {
@@ -305,20 +338,25 @@ const MoleculeVisualizer = () => {
     { value: "H", label: "H" },
     { value: "O", label: "O" },
     { value: "N", label: "N" },
+    { value: "P", label: "P" },
+    { value: "S", label: "S" },
+    { value: "F", label: "F" },
+    { value: "Cl", label: "Cl" },
   ];
 
   const getBondMenuItems = () => {
-    const bondMenuItems = [
-      { value: "A1", label: "A1" },
-      { value: "A2", label: "A2" },
-      { value: "A3", label: "A3" },
-      { value: "A4", label: "A4" },
-      { value: "A5", label: "A5" },
-    ];
+    const bondMenuItems = [];
 
     molecule.atomList.forEach((atom) => {
       bondMenuItems.push({ value: atom.atomName, label: atom.atomName });
     });
+
+    // Add placeholder items if there aren't enough atoms
+    if (bondMenuItems.length < 2) {
+      for (let i = bondMenuItems.length; i < 2; i++) {
+        bondMenuItems.push({ value: `A${i + 1}`, label: `A${i + 1}` });
+      }
+    }
 
     return bondMenuItems;
   };
@@ -330,10 +368,15 @@ const MoleculeVisualizer = () => {
       <NavBar />
       <div className="flex flex-row w-screen overflow-hidden h-full text-white">
         <div className="flex w-1/4">
-          <AISection compoundFormula={compoundFormula} />
+          <AISection compoundFormula={compoundFormula} resetAI={resetAI} />
         </div>
         <Plot
-          data={[traceAtoms, traceSingleBonds, traceDoubleBonds]}
+          data={[
+            traceAtoms,
+            traceSingleBonds,
+            traceDoubleBonds,
+            traceTripleBonds,
+          ]}
           layout={layout}
           style={{ width: "50%", height: "100%" }}
         />

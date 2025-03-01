@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 
-export default function AiSection({ compoundFormula }) {
+export default function AISection({ compoundFormula, resetAI }) {
   const [res, setResponse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -11,7 +11,26 @@ export default function AiSection({ compoundFormula }) {
     process.env.REACT_APP_BACKEND_URL || "https://molecule-backend.vercel.app";
   console.log(BASE_URL);
 
+  // Reset the response when resetAI changes to true
+  useEffect(() => {
+    if (resetAI) {
+      setResponse(null);
+    }
+  }, [resetAI]);
+
+  // Reset the response when compoundFormula becomes empty
+  useEffect(() => {
+    if (!compoundFormula || compoundFormula === "") {
+      setResponse(null);
+    }
+  }, [compoundFormula]);
+
   const handleGetData = () => {
+    // Don't fetch if there's no compound formula
+    if (!compoundFormula || compoundFormula === "") {
+      return;
+    }
+
     setIsLoading(true);
     axios
       .get(`${BASE_URL}/getinfo/${compoundFormula}`)
@@ -57,7 +76,7 @@ export default function AiSection({ compoundFormula }) {
         </div>
       ) : (
         <>
-          {!res && (
+          {!res && compoundFormula && (
             <button
               onClick={handleGetData}
               className="flex justify-center items-center border-2 border-[#2ABD91] py-2 rounded-full mx-auto cursor-pointer px-6 hover:bg-[#2ABD91] hover:text-black"
@@ -65,10 +84,17 @@ export default function AiSection({ compoundFormula }) {
               Get Molecule Info
             </button>
           )}
+          {!compoundFormula && (
+            <div className="text-center text-gray-400">
+              Build a molecule to get information
+            </div>
+          )}
           {res && (
             <div className="p-3 rounded-lg shadow-sm border-2 border-light ">
               <div className="max-w-4xl mx-auto">
-                <ReactMarkdown className="markdown-container" children={res} />
+                <ReactMarkdown className="markdown-container">
+                  {res}
+                </ReactMarkdown>
               </div>
             </div>
           )}
