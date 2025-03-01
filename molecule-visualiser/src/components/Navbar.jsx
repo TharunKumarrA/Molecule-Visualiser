@@ -20,6 +20,9 @@ export default function NavBar() {
           <Link to="/" className="hover:text-[#2ABD91]">
             VISUALIZER
           </Link>
+          <Link to="/teams" className="hover:text-[#2ABD91]">
+            TEAM
+          </Link>
           <a
             target="_blank"
             href="https://docs.google.com/document/d/1-CaxNnUyd82sx9O1TEZEkHnVVooVond2aKkf7o9au8w/edit?usp=sharing"
@@ -28,9 +31,6 @@ export default function NavBar() {
           >
             DOCUMENTATION
           </a>
-          <Link to="/teams" className="hover:text-[#2ABD91]">
-            TEAM
-          </Link>
         </div>
 
         <button

@@ -364,43 +364,44 @@ const MoleculeVisualizer = () => {
   const sampleMolecules = ["CH4", "C2H6", "C6H6", "H2O", "SF6", "PCl5"];
 
   return (
-    <div className="flex flex-col h-screen bg-[#141414] font-inter">
+    <div>
       <NavBar />
-      {/* Warning message for small and medium screens */}
-      <div className="flex sm:hidden items-center justify-center h-full w-screen bg-red-500 text-white text-lg font-bold text-center">
-        This site is not available on mobile or tablet screens. Please use a
-        larger screen.
-      </div>
-
-      {/* Main content, hidden on sm and md screens */}
-      <div className="hidden sm:flex flex-row w-screen overflow-hidden h-full text-white">
-        <div className="flex w-1/4">
-          <AISection compoundFormula={compoundFormula} resetAI={resetAI} />
+      <div className="flex flex-col h-screen bg-[#141414] font-inter">
+        {/* Warning message for small and medium screens */}
+        <div className="flex sm:hidden items-center justify-center h-full w-screen bg-red-500 text-white text-lg font-bold text-center">
+          This site is not available on mobile or tablet screens. Please use a
+          larger screen.
         </div>
-        <Plot
-          data={[
-            traceAtoms,
-            traceSingleBonds,
-            traceDoubleBonds,
-            traceTripleBonds,
-          ]}
-          layout={layout}
-          style={{ width: "50%", height: "100%" }}
-        />
-        <div className="flex w-1/4">
-          <EditMolecule
-            atomMenuItems={atomMenuItems}
-            bondMenuItems={getBondMenuItems()}
-            sampleMolecules={sampleMolecules}
-            molecule={molecule}
-            setMolecule={setMolecule}
-            atomsList={atomsList}
-            setAtomsList={setAtomsList}
-            handleDataFromEditMolecule={handleDataFromEditMolecule}
-            atomCounters={atomCounters}
-            handleMoleculeUpdate={handleMoleculeUpdate}
-            setAtomCounters={setAtomCounters}
+        {/* Main content, hidden on sm and md screens */}
+        <div className="hidden sm:flex flex-row w-screen overflow-hidden h-full text-white">
+          <div className="flex w-1/4">
+            <AISection compoundFormula={compoundFormula} resetAI={resetAI} />
+          </div>
+          <Plot
+            data={[
+              traceAtoms,
+              traceSingleBonds,
+              traceDoubleBonds,
+              traceTripleBonds,
+            ]}
+            layout={layout}
+            style={{ width: "50%", height: "100%" }}
           />
+          <div className="flex w-1/4">
+            <EditMolecule
+              atomMenuItems={atomMenuItems}
+              bondMenuItems={getBondMenuItems()}
+              sampleMolecules={sampleMolecules}
+              molecule={molecule}
+              setMolecule={setMolecule}
+              atomsList={atomsList}
+              setAtomsList={setAtomsList}
+              handleDataFromEditMolecule={handleDataFromEditMolecule}
+              atomCounters={atomCounters}
+              handleMoleculeUpdate={handleMoleculeUpdate}
+              setAtomCounters={setAtomCounters}
+            />
+          </div>
         </div>
       </div>
     </div>
